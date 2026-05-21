@@ -92,6 +92,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     cron \
     logrotate \
+    zstd \
     && rm -rf /var/lib/apt/lists/*
 
 # Move logrotate to cron.hourly so it checks sizes more frequently
