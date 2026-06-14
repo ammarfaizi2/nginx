@@ -467,7 +467,12 @@ found:
          *    sent for this request at all).
          */
         if (blocked_ms >= (ctx->penalty_ms * 2)) {
-            ngx_shutdown_socket(r->connection->fd, NGX_RDWR_SHUTDOWN);
+            /*
+             * Don't shutdown a QUIC connection, it results in infinite
+             * retry loops epoll_wait() -> recvmsg().
+             */
+            if (!r->connection->quic)
+                ngx_shutdown_socket(r->connection->fd, NGX_RDWR_SHUTDOWN);
             cur_node->blocked_until += 500;
         } else {
             cur_node->blocked_until += 200;
