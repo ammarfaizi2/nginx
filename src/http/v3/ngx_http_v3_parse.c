@@ -1543,7 +1543,7 @@ ngx_http_v3_parse_field_inr(ngx_connection_t *c,
 
             st->literal.length = st->pint.value;
             if (st->literal.length == 0) {
-                st->value.len = 0;
+                ngx_str_set(&st->value, "");
                 goto done;
             }
 
@@ -1667,7 +1667,7 @@ ngx_http_v3_parse_field_iln(ngx_connection_t *c,
 
             st->literal.length = st->pint.value;
             if (st->literal.length == 0) {
-                st->value.len = 0;
+                ngx_str_set(&st->value, "");
                 goto done;
             }
 
@@ -1861,6 +1861,8 @@ ngx_http_v3_parse_data(ngx_connection_t *c, ngx_http_v3_parse_data_t *st,
                            st->type, st->length);
 
             if (st->type != NGX_HTTP_V3_FRAME_DATA && st->length > 0) {
+                st->skip = st->length;
+                st->length = 0;
                 st->state = sw_skip;
                 break;
             }
@@ -1870,7 +1872,7 @@ ngx_http_v3_parse_data(ngx_connection_t *c, ngx_http_v3_parse_data_t *st,
 
         case sw_skip:
 
-            rc = ngx_http_v3_parse_skip(b, &st->length);
+            rc = ngx_http_v3_parse_skip(b, &st->skip);
             if (rc != NGX_DONE) {
                 return rc;
             }
